@@ -82,11 +82,98 @@ I will first demonstrate that Rust can be used for more than just printing *Hell
 As we can see, we still get the default *Hello World!* print statement in the `main.rs`. Now, let us delete this and replace it with the following:
 
 ```rust
-use nalgebra::{DMatrix, DVector, Scalar};
+use ndarray::arr2;
+
+fn main() {
+    let a = arr2(&[[1, 2, 3],
+                   [4, 5, 6]]);
+
+    let b = arr2(&[[6, 5, 4],
+                   [3, 2, 1]]);
+
+    let sum = &a + &b;
+
+    println!("{}", a);
+    println!("+");
+    println!("{}", b);
+    println!("=");
+    println!("{}", sum);
+}
+```
+
+We used a non-default crate in this program, namely `ndarray`. This is similar to Python's `numpy`, which does not ship with standard operations on arrays by default. To add this crate to the project, we need to tell `cargo`:
+
+        cargo add ndarray
+
+Notice the `.toml` file that gets updated automatically. Let's look at the code. We perform matrix addition here where $a$, $b$, and $sum$ are all $2 \times 3$ matrices. Notice that we need to tell Rust exactly what dimension the array has. The `&` operator represents *references*, and they allow you to refer to some value without taking ownership of it. This is called *borrowing* in Rust, and the concept goes beyond this little demo. Just remember: When we want to use values stored in some objects and not take ownership of them, we need to add `&`.
+
+Let's see how matrix multiplication works:
+
+```rust
+use ndarray::arr2;
+
+fn main() {
+    let a = arr2(&[[1, 2, 3],
+                   [4, 5, 6]]);
+
+    let b = arr2(&[[6, 3],
+                    [5, 2],
+                    [4, 1]]);
+
+    println!("a * b =");
+    println!("{}", a.dot(&c));
+}
 
 ```
-We used non-default crates in this program, namely `nalgebra` and `ndarray`. To add them to the project, we need to tell this to `cargo`:
 
-        cargo add ndarray nalgebra
+Let us try to do some basic matrix inversion with some exception handling in case the matrix turns out to be singular. First, let's add the `nalgebra` crate to the project by typing
 
-Notice the `.toml` file that gets updated automatically.
+        cargo add nalgebra
+
+Consider the following program:
+
+```rust
+use nalgebra::Matrix3;
+
+fn main() {
+    let m1 = Matrix3::new(2.0, 1.0, 1.0, 3.0, 2.0, 1.0, 2.0, 1.0, 2.0); // row-wise construction
+    println!("m1 = {}", m1);
+    match m1.try_inverse() {
+        Some(inv) => {
+            println!("The inverse of m1 is: {}", inv);
+        }
+        None => {
+            println!("m1 is not invertible!");
+        }
+    }
+}
+```
+
+### Some VS Code details
+
+To use Rust in VS Code, I recommend installing the following extensions:
+
+1. rust-analyzer
+![rust-analyzer extension](resources/03_rust_extension.png)
+
+2. Even better TOML, to improve `.toml` file handling
+![ebt](resources/04_toml_extension.png)
+
+3. CodeLLDB for debugging purposes
+![LLDB](resources/05_lldb_extension.png)
+
+4. crates for version handling of Rust crates
+![crates](resources/06_crates_extension.png)
+
+In general, I recommend using the `code-runner` extension in VS Code. This allows you to automatically send your code to a new terminal and run it in the background.
+
+![code-runner](resources/09_code_runner.png)
+
+We need a little hack to prioritize `cargo run` in the code-runner for Rust code. Open your user settings (JSON) and add the following line:
+
+```json
+"code-runner.executorMap": {
+        "rust": "cargo run # $fileName",
+},
+```
+Now you're all set and good to go.
