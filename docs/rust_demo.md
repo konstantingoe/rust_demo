@@ -149,6 +149,11 @@ fn main() {
 }
 ```
 
+## Linear Regression demo
+
+
+
+
 ### Some VS Code details
 
 To use Rust in VS Code, I recommend installing the following extensions:
